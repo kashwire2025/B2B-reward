@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>B2B Reward</title>
 
-  <script src="https://alwingulla.com/88/tag.min.js" data-zone="11687896" async data-cfasync="false"></script>
+  <!-- Monetag Rewarded Interstitial Tag (Zone 11691092) -->
+  <script src="https://alwingulla.com/88/tag.min.js" data-zone="11691092" async data-cfasync="false"></script>
   
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
@@ -75,8 +76,9 @@
 </head>
 <body>
 
+  <!-- Top Bar -->
   <div class="top-bar">
-    <select id="lang-select" class="select-dropdown" onchange="changeLanguage(this.value)">
+    <select id="lang-select" class="select-dropdown">
       <option value="en">🇺🇸 English</option>
       <option value="ru">🇷🇺 Русский</option>
       <option value="es">🇪🇸 Español</option>
@@ -88,6 +90,7 @@
     <button class="theme-toggle" onclick="toggleTheme()"><span id="theme-icon">🌙</span></button>
   </div>
 
+  <!-- Balance Header -->
   <div class="card">
     <div class="balance-label">Your Balance</div>
     <div class="balance-val"><span id="balance">0</span> B2B</div>
@@ -101,6 +104,7 @@
 
   <div id="ton-connect" style="display: flex; justify-content: center; margin-bottom: 16px;"></div>
 
+  <!-- Daily Check-In Card -->
   <div class="ad-card" style="border: 1px solid #8957e5;">
     <span class="ad-badge" style="background: #8957e5;">STREAK</span>
     <div class="ad-flex">
@@ -112,6 +116,7 @@
     </div>
   </div>
 
+  <!-- Referral Banner Card -->
   <div class="ad-card" style="border: 1px solid #388bfd;">
     <span class="ad-badge" style="background: #388bfd;">INVITE</span>
     <div class="ad-flex">
@@ -123,6 +128,7 @@
     </div>
   </div>
 
+  <!-- Stats Grid -->
   <div class="stats-grid">
     <div class="stat-box">
       <div class="stat-title">Tasks</div>
@@ -138,8 +144,10 @@
     </div>
   </div>
 
+  <!-- Watch Ads Section -->
   <div class="section-title">💰 Watch Ads & Earn</div>
 
+  <!-- Daily Ads Card -->
   <div class="ad-card">
     <span class="ad-badge">DAILY</span>
     <div class="ad-flex">
@@ -151,6 +159,7 @@
     </div>
   </div>
 
+  <!-- Unlimited Ads Card -->
   <div class="ad-card">
     <span class="ad-badge" style="background: #a371f7;">UNLIMITED</span>
     <div class="ad-flex">
@@ -162,6 +171,7 @@
     </div>
   </div>
 
+  <!-- Dynamic Social Tasks Section -->
   <div class="section-title">✨ Social Tasks</div>
   <div id="social-tasks-container"></div>
 
@@ -169,6 +179,8 @@
     const SUPABASE_URL = 'https://drfbjrbleuyjunxzjsae.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyZmJqcmJmZXV5anVueHpqc2FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNDQzODUsImV4cCI6MjEwMzYyMDM4NX0.XMn6B-o6_Qbtwp1aYQIl0vOLKvNTN2irPO47hEtoVSE';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const MONETAG_DIRECT_LINK = "";
 
     const tg = window.Telegram.WebApp;
     tg.expand();
@@ -182,27 +194,68 @@
     let socialTasks = [];
     const taskStates = {};
 
+    // Default social tasks list containing all provided links
+    const DEFAULT_SOCIAL_TASKS = [
+      { id: 'x_1', title: 'Follow Maxit on X', icon: '𝕏', url: 'https://www.x.com/Maxit_official', points: 100 },
+      { id: 'fb_1', title: 'Follow Facebook Page 1', icon: '📘', url: 'https://www.facebook.com/share/1UGiF61DoX/', points: 100 },
+      { id: 'fb_2', title: 'Follow Facebook Page 2', icon: '📘', url: 'https://www.facebook.com/share/1HRazBLC41/', points: 100 },
+      { id: 'fb_post_1', title: 'Like & Comment on FB Post 1', icon: '👍', url: 'https://www.facebook.com/share/p/19EbFQR4MQ/', points: 100 },
+      { id: 'fb_post_2', title: 'Like & Comment on FB Post 2', icon: '👍', url: 'https://www.facebook.com/share/p/14w6j8XcBBu/', points: 100 },
+      { id: 'ig_1', title: 'Follow on Instagram', icon: '📸', url: 'https://www.instagram.com/maxitofficial2025', points: 100 },
+      { id: 'yt_ch_1', title: 'Subscribe: Script Detective', icon: '📺', url: 'https://youtube.com/@scriptdetective_4u?si=5bqqqZTvfLfwn3lf', points: 100 },
+      { id: 'yt_ch_2', title: 'Subscribe: Kashlink', icon: '📺', url: 'https://youtube.com/@kashlink6837?si=8389yiu20FEycVWY', points: 100 },
+      { id: 'yt_s_1', title: 'Like & Comment YouTube Short 1', icon: '▶️', url: 'https://youtube.com/shorts/mvKGqwzDA5w?si=TFCW8O7EST5BoBYZ', points: 100 },
+      { id: 'yt_s_2', title: 'Like & Comment YouTube Short 2', icon: '▶️', url: 'https://youtube.com/shorts/fKpTIOJFSZk?si=3yQeemQrtsy1neqk', points: 100 },
+      { id: 'yt_s_3', title: 'Like & Comment YouTube Short 3', icon: '▶️', url: 'https://youtube.com/shorts/L8xHjg7SQ4c?si=htUvL9VgJJmcqPYP', points: 100 },
+      { id: 'yt_s_4', title: 'Like & Comment YouTube Short 4', icon: '▶️', url: 'https://youtube.com/shorts/upkk8UERLtk?si=wSKTc6RfdF4OZFes', points: 100 },
+      { id: 'tg_c_1', title: 'Join Telegram: Maxit001', icon: '📢', url: 'https://t.me/maxit001', points: 100 },
+      { id: 'tg_c_2', title: 'Join Telegram: Ogihtu', icon: '📢', url: 'https://t.me/ogihtu', points: 100 },
+      { id: 'tg_c_3', title: 'Join Telegram: Earnings Family', icon: '📢', url: 'https://t.me/earningsfamily9', points: 100 },
+      { id: 'tg_c_4', title: 'Join Telegram: B2B Reward Channel', icon: '📢', url: 'https://t.me/b2breward', points: 100 },
+      { id: 'tg_c_5', title: 'Join Telegram: B2B Official', icon: '📢', url: 'https://t.me/b2brewardofficial', points: 100 },
+      { id: 'tg_g_1', title: 'Join Telegram Group 1', icon: '💬', url: 'https://t.me/+5NtA9f4T0205MGI0', points: 100 },
+      { id: 'tg_g_2', title: 'Join Telegram Group 2', icon: '💬', url: 'https://t.me/+acEh3NkUu_A3MmVk', points: 100 },
+      { id: 'tg_g_3', title: 'Join Telegram Group 3', icon: '💬', url: 'https://t.me/+5w2BFuJydkU5MzI0', points: 100 },
+      { id: 'tg_g_4', title: 'Join Telegram Group 4', icon: '💬', url: 'https://t.me/+Y3T4911F_OcyMjJk', points: 100 },
+      { id: 'tg_g_5', title: 'Join Telegram Group 5', icon: '💬', url: 'https://t.me/+QQMK2wkd4ccxYmRk', points: 100 },
+      { id: 'tg_g_6', title: 'Join Telegram: Starlinks AI', icon: '💬', url: 'https://t.me/starlinks_ai', points: 100 },
+      { id: 'tg_g_7', title: 'Join Telegram Group 7', icon: '💬', url: 'https://t.me/+OAh6cygVYcMxZTU0', points: 100 }
+    ];
+
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
       manifestUrl: 'https://b2-b-reward.vercel.app/tonconnect-manifest.json',
       buttonRootId: 'ton-connect'
     });
 
-    // Helper: Displays full screen ad before executing success callback
+    // Rewarded Interstitial Ad Trigger (Zone 11691092)
     function triggerFullScreenAd(btnId, callback) {
       const btn = document.getElementById(btnId);
       if (btn) btn.disabled = true;
 
-      // Call Monetag full screen ad
-      if (typeof show_11687896 === 'function') {
-        show_11687896().then(() => {
-          runCountdownAndReward(btnId, callback);
-        }).catch(() => {
-          // Fallback if ad fails to load
-          runCountdownAndReward(btnId, callback);
-        });
+      if (typeof window.show_11691092 === 'function') {
+        window.show_11691092()
+          .then(() => {
+            runCountdownAndReward(btnId, callback);
+          })
+          .catch((err) => {
+            console.warn("Rewarded ad failed or was closed early:", err);
+            executeFallback(btnId, callback);
+          });
       } else {
-        runCountdownAndReward(btnId, callback);
+        console.warn("Monetag script not available. Running fallback.");
+        executeFallback(btnId, callback);
       }
+    }
+
+    function executeFallback(btnId, callback) {
+      if (MONETAG_DIRECT_LINK) {
+        if (tg.openLink) {
+          tg.openLink(MONETAG_DIRECT_LINK);
+        } else {
+          window.open(MONETAG_DIRECT_LINK, '_blank');
+        }
+      }
+      runCountdownAndReward(btnId, callback);
     }
 
     function runCountdownAndReward(btnId, callback) {
@@ -232,36 +285,38 @@
           .select('*')
           .order('created_at', { ascending: true });
 
-        if (error) throw error;
-
-        socialTasks = data || [];
-        container.innerHTML = '';
-
-        if (socialTasks.length === 0) {
-          container.innerHTML = '<p style="text-align:center; color: var(--text-sub);">No active social tasks.</p>';
-          return;
+        if (!error && data && data.length > 0) {
+          socialTasks = data;
+        } else {
+          socialTasks = DEFAULT_SOCIAL_TASKS;
         }
-
-        socialTasks.forEach(t => {
-          container.innerHTML += `
-            <div class="task-row">
-              <div class="task-left">
-                <div class="task-icon">${t.icon}</div>
-                <div class="task-details">
-                  <h5>${t.title}</h5>
-                  <span>+${t.points} B2B</span>
-                </div>
-              </div>
-              <button id="btn-${t.id}" class="btn-task" onclick="handleTaskFlow('btn-${t.id}', '${t.url}', ${t.points})">Start →</button>
-            </div>
-          `;
-        });
-
-        document.getElementById('task-progress').innerText = `${completedTasksCount}/${socialTasks.length}`;
       } catch (err) {
-        console.error('Error loading social tasks:', err);
-        container.innerHTML = '<p style="text-align:center; color: #f85149;">Failed to load tasks.</p>';
+        console.warn('Using default tasks array:', err);
+        socialTasks = DEFAULT_SOCIAL_TASKS;
       }
+
+      renderSocialTasks(container);
+    }
+
+    function renderSocialTasks(container) {
+      container.innerHTML = '';
+
+      socialTasks.forEach(t => {
+        container.innerHTML += `
+          <div class="task-row">
+            <div class="task-left">
+              <div class="task-icon">${t.icon || '✨'}</div>
+              <div class="task-details">
+                <h5>${t.title}</h5>
+                <span>+${t.points} B2B</span>
+              </div>
+            </div>
+            <button id="btn-${t.id}" class="btn-task" onclick="handleTaskFlow('btn-${t.id}', '${t.url}', ${t.points})">Start →</button>
+          </div>
+        `;
+      });
+
+      document.getElementById('task-progress').innerText = `${completedTasksCount}/${socialTasks.length}`;
     }
 
     async function initUser() {
@@ -367,12 +422,16 @@
       const currentState = taskStates[btnId] || 'start';
 
       if (currentState === 'start') {
-        window.open(targetUrl, '_blank');
+        if (tg.openLink) {
+          tg.openLink(targetUrl);
+        } else {
+          window.open(targetUrl, '_blank');
+        }
         taskStates[btnId] = 'claim';
         btn.innerText = 'Claim';
         btn.style.background = '#8957e5';
       } else if (currentState === 'claim') {
-        // Require full screen ad watch before claiming social task points
+        // Requires full ad view prior to crediting task reward
         triggerFullScreenAd(btnId, () => {
           updateBalance(reward);
           taskStates[btnId] = 'done';
