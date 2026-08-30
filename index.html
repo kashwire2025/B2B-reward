@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <meta name="monetag" content="80352d1141f5c6b9d15bfb4a5c0dc647">
   <title>B2B Reward</title>
+
+  <script>(function(s){s.dataset.zone='11687896',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
   
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-  <script src="https://quge5.com/88/tag.min.js" data-zone="274553" async data-cfasync="false"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -78,7 +78,6 @@
 </head>
 <body>
 
-  <!-- Top Bar Controls -->
   <div class="top-bar">
     <select id="lang-select" class="select-dropdown" onchange="changeLanguage(this.value)">
       <option value="en">🇺🇸 English</option>
@@ -92,7 +91,6 @@
     <button class="theme-toggle" onclick="toggleTheme()"><span id="theme-icon">🌙</span></button>
   </div>
 
-  <!-- Balance Header -->
   <div class="card">
     <div class="balance-label" id="txt-your-balance">Your Balance</div>
     <div class="balance-val"><span id="balance">0</span> B2B</div>
@@ -106,7 +104,6 @@
 
   <div id="ton-connect" style="display: flex; justify-content: center; margin-bottom: 16px;"></div>
 
-  <!-- Stats Grid -->
   <div class="stats-grid">
     <div class="stat-box">
       <div class="stat-title" id="txt-stat-tasks">Tasks</div>
@@ -122,10 +119,8 @@
     </div>
   </div>
 
-  <!-- Watch Ads Section -->
   <div class="section-title" id="txt-title-ads">💰 Watch Ads & Earn</div>
 
-  <!-- Daily Ads Card -->
   <div class="ad-card">
     <span class="ad-badge" id="txt-badge-daily">DAILY</span>
     <div class="ad-flex">
@@ -137,7 +132,6 @@
     </div>
   </div>
 
-  <!-- Unlimited Ads Card -->
   <div class="ad-card">
     <span class="ad-badge" style="background: #a371f7;" id="txt-badge-unlimited">UNLIMITED</span>
     <div class="ad-flex">
@@ -149,10 +143,8 @@
     </div>
   </div>
 
-  <!-- Featured Tasks Section -->
   <div class="section-title" id="txt-title-tasks">✨ Featured Tasks</div>
 
-  <!-- Task 1 -->
   <div class="task-row">
     <div class="task-left">
       <div class="task-icon">𝕏</div>
@@ -164,7 +156,6 @@
     <button id="task1-btn" class="btn-task" onclick="handleTaskFlow('task1-btn', 'https://x.com/YourHandle', 200)">Start →</button>
   </div>
 
-  <!-- Task 2 -->
   <div class="task-row">
     <div class="task-left">
       <div class="task-icon">💬</div>
@@ -363,17 +354,26 @@
       }, 1000);
     }
 
+    function triggerVignetteAd(onComplete) {
+      if (typeof show_11687896 === 'function') {
+        show_11687896().then(() => {
+          onComplete();
+        }).catch((err) => {
+          console.error("Vignette ad error:", err);
+          onComplete();
+        });
+      } else {
+        onComplete();
+      }
+    }
+
     function watchDailyAd() {
       if (dailyAdCount >= 40) {
         alert("Daily limit of 40 ads reached!");
         return;
       }
 
-      if (typeof show_274553 !== 'undefined') {
-        show_274553().then(() => processDailyAdReward()).catch(() => processDailyAdReward());
-      } else {
-        processDailyAdReward();
-      }
+      triggerVignetteAd(processDailyAdReward);
     }
 
     function processDailyAdReward() {
@@ -392,11 +392,7 @@
     }
 
     function watchUnlimitedAd() {
-      if (typeof show_274553 !== 'undefined') {
-        show_274553().then(() => processUnlimitedAdReward()).catch(() => processUnlimitedAdReward());
-      } else {
-        processUnlimitedAdReward();
-      }
+      triggerVignetteAd(processUnlimitedAdReward);
     }
 
     function processUnlimitedAdReward() {
