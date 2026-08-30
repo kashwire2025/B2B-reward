@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>B2B Reward</title>
 
-  <!-- Monetag Vignette Script -->
-  <script>(function(s){s.dataset.zone='11687896',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+  <script src="https://alwingulla.com/88/tag.min.js" data-zone="11687896" async data-cfasync="false"></script>
   
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
@@ -76,7 +75,6 @@
 </head>
 <body>
 
-  <!-- Top Bar -->
   <div class="top-bar">
     <select id="lang-select" class="select-dropdown" onchange="changeLanguage(this.value)">
       <option value="en">🇺🇸 English</option>
@@ -90,7 +88,6 @@
     <button class="theme-toggle" onclick="toggleTheme()"><span id="theme-icon">🌙</span></button>
   </div>
 
-  <!-- Balance Header -->
   <div class="card">
     <div class="balance-label">Your Balance</div>
     <div class="balance-val"><span id="balance">0</span> B2B</div>
@@ -104,7 +101,6 @@
 
   <div id="ton-connect" style="display: flex; justify-content: center; margin-bottom: 16px;"></div>
 
-  <!-- Daily Check-In Card -->
   <div class="ad-card" style="border: 1px solid #8957e5;">
     <span class="ad-badge" style="background: #8957e5;">STREAK</span>
     <div class="ad-flex">
@@ -116,7 +112,6 @@
     </div>
   </div>
 
-  <!-- Referral Banner Card -->
   <div class="ad-card" style="border: 1px solid #388bfd;">
     <span class="ad-badge" style="background: #388bfd;">INVITE</span>
     <div class="ad-flex">
@@ -128,7 +123,6 @@
     </div>
   </div>
 
-  <!-- Stats Grid -->
   <div class="stats-grid">
     <div class="stat-box">
       <div class="stat-title">Tasks</div>
@@ -144,10 +138,8 @@
     </div>
   </div>
 
-  <!-- Watch Ads Section -->
   <div class="section-title">💰 Watch Ads & Earn</div>
 
-  <!-- Daily Ads Card -->
   <div class="ad-card">
     <span class="ad-badge">DAILY</span>
     <div class="ad-flex">
@@ -159,7 +151,6 @@
     </div>
   </div>
 
-  <!-- Unlimited Ads Card -->
   <div class="ad-card">
     <span class="ad-badge" style="background: #a371f7;">UNLIMITED</span>
     <div class="ad-flex">
@@ -171,7 +162,6 @@
     </div>
   </div>
 
-  <!-- Dynamic Social Tasks Section -->
   <div class="section-title">✨ Social Tasks</div>
   <div id="social-tasks-container"></div>
 
@@ -196,6 +186,41 @@
       manifestUrl: 'https://b2-b-reward.vercel.app/tonconnect-manifest.json',
       buttonRootId: 'ton-connect'
     });
+
+    // Helper: Displays full screen ad before executing success callback
+    function triggerFullScreenAd(btnId, callback) {
+      const btn = document.getElementById(btnId);
+      if (btn) btn.disabled = true;
+
+      // Call Monetag full screen ad
+      if (typeof show_11687896 === 'function') {
+        show_11687896().then(() => {
+          runCountdownAndReward(btnId, callback);
+        }).catch(() => {
+          // Fallback if ad fails to load
+          runCountdownAndReward(btnId, callback);
+        });
+      } else {
+        runCountdownAndReward(btnId, callback);
+      }
+    }
+
+    function runCountdownAndReward(btnId, callback) {
+      const btn = document.getElementById(btnId);
+      let secondsLeft = 5;
+      if (btn) btn.innerText = `Wait (${secondsLeft}s)...`;
+
+      const interval = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft > 0) {
+          if (btn) btn.innerText = `Wait (${secondsLeft}s)...`;
+        } else {
+          clearInterval(interval);
+          if (btn) btn.disabled = false;
+          callback();
+        }
+      }, 1000);
+    }
 
     async function fetchAndRenderSocialTasks() {
       const container = document.getElementById('social-tasks-container');
@@ -281,28 +306,36 @@
     }
 
     function claimDailyCheckIn() {
-      const today = new Date().toDateString();
-      let streak = parseInt(localStorage.getItem('streak_days') || '0');
-      
-      streak = (streak % 7) + 1;
-      let reward = 50;
-
-      if (streak === 7) {
-        reward += 200;
-        alert('🎉 7-Day Streak Complete! +200 B2B Bonus Awarded!');
-      } else {
-        alert(`Daily check-in claimed! +50 B2B (Day ${streak})`);
+      const wallet = tonConnectUI.account?.address;
+      if (!wallet) {
+        alert("⚠️ Please connect your TON wallet first to claim daily rewards!");
+        return;
       }
 
-      localStorage.setItem('last_checkin_date', today);
-      localStorage.setItem('streak_days', streak);
-      document.getElementById('streak-days').innerText = streak;
+      triggerFullScreenAd('checkin-btn', () => {
+        const today = new Date().toDateString();
+        let streak = parseInt(localStorage.getItem('streak_days') || '0');
+        
+        streak = (streak % 7) + 1;
+        let reward = 50;
 
-      updateBalance(reward);
-      const btn = document.getElementById('checkin-btn');
-      btn.disabled = true;
-      btn.innerText = 'Claimed ✓';
-      btn.style.background = '#21262d';
+        if (streak === 7) {
+          reward += 200;
+          alert('🎉 7-Day Streak Complete! +200 B2B Bonus Awarded!');
+        } else {
+          alert(`Daily check-in claimed! +50 B2B (Day ${streak})`);
+        }
+
+        localStorage.setItem('last_checkin_date', today);
+        localStorage.setItem('streak_days', streak);
+        document.getElementById('streak-days').innerText = streak;
+
+        updateBalance(reward);
+        const btn = document.getElementById('checkin-btn');
+        btn.disabled = true;
+        btn.innerText = 'Claimed ✓';
+        btn.style.background = '#21262d';
+      });
     }
 
     function watchDailyAd() {
@@ -310,41 +343,23 @@
         alert("Daily limit of 40 ads reached!");
         return;
       }
-      triggerAdWithVerification('daily-ad-btn', 50, () => {
+      triggerFullScreenAd('daily-ad-btn', () => {
         dailyAdCount++;
         document.getElementById('daily-count').innerText = dailyAdCount;
+        updateBalance(50);
+        const btn = document.getElementById('daily-ad-btn');
+        if (btn) btn.innerText = 'Watch';
       });
     }
 
     function watchUnlimitedAd() {
-      triggerAdWithVerification('unlimited-ad-btn', 50, () => {
+      triggerFullScreenAd('unlimited-ad-btn', () => {
         unlimitedAdCount++;
         document.getElementById('unlimited-count').innerText = unlimitedAdCount;
+        updateBalance(50);
+        const btn = document.getElementById('unlimited-ad-btn');
+        if (btn) btn.innerText = 'Watch';
       });
-    }
-
-    function triggerAdWithVerification(btnId, rewardAmount, callback) {
-      const btn = document.getElementById(btnId);
-      btn.disabled = true;
-      let secondsLeft = 5;
-      btn.innerText = `Wait (${secondsLeft}s)...`;
-
-      if (typeof show_11687896 === 'function') {
-        try { show_11687896(); } catch (e) { console.log(e); }
-      }
-
-      const interval = setInterval(() => {
-        secondsLeft--;
-        if (secondsLeft > 0) {
-          btn.innerText = `Wait (${secondsLeft}s)...`;
-        } else {
-          clearInterval(interval);
-          btn.disabled = false;
-          btn.innerText = 'Watch';
-          updateBalance(rewardAmount);
-          callback();
-        }
-      }, 1000);
     }
 
     function handleTaskFlow(btnId, targetUrl, reward) {
@@ -357,13 +372,16 @@
         btn.innerText = 'Claim';
         btn.style.background = '#8957e5';
       } else if (currentState === 'claim') {
-        updateBalance(reward);
-        taskStates[btnId] = 'done';
-        btn.innerText = '✓';
-        btn.classList.add('done');
-        btn.disabled = true;
-        completedTasksCount++;
-        updateUI();
+        // Require full screen ad watch before claiming social task points
+        triggerFullScreenAd(btnId, () => {
+          updateBalance(reward);
+          taskStates[btnId] = 'done';
+          btn.innerText = '✓';
+          btn.classList.add('done');
+          btn.disabled = true;
+          completedTasksCount++;
+          updateUI();
+        });
       }
     }
 
