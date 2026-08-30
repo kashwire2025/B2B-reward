@@ -3,14 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Monetag Verification Tag -->
+  <meta name="monetag" content="80352d1141f5c6b9d15bfb4a5c0dc647">
+
   <title>B2B Reward</title>
   
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   
-  <!-- TON Connect UI for Wallet Connection -->
+  <!-- TON Connect UI -->
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-  
+
   <style>
     body {
       background-color: #0f172a;
@@ -52,14 +56,11 @@
     <p style="font-size: 12px; color: #94a3b8;">Minimum payout: 20,000 B2B ($10)</p>
   </div>
 
-  <!-- TON Wallet Connect Button -->
   <div id="ton-connect" style="display: flex; justify-content: center; margin-bottom: 20px;"></div>
 
-  <!-- Task Buttons -->
   <div class="card">
     <button class="btn btn-blue" onclick="handleTask('daily_checkin')">Daily Check-in (+100 B2B)</button>
-    <button class="btn btn-green" onclick="handleTask('unlimited_ad')">Watch Unlimited Ad (+100 B2B)</button>
-    <button class="btn btn-blue" onclick="handleTask('daily_ad')">Daily Ad (<span id="ad-count">0</span>/40) (+100 B2B)</button>
+    <button class="btn btn-green" onclick="watchRewardedAd()">Watch Ad (+100 B2B)</button>
     <button class="btn btn-purple" onclick="handleTask('social_task')">Social Special Task (+200 B2B)</button>
   </div>
 
@@ -68,19 +69,26 @@
   </div>
 
   <script>
-    // Initialize Telegram WebApp
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // Initialize TON Wallet Connection
+    let balance = 0;
+
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-      manifestUrl: 'https://b2b-reward.vercel.app/tonconnect-manifest.json', // Updated after deployment
+      manifestUrl: 'https://b2-b-reward.vercel.app/tonconnect-manifest.json',
       buttonRootId: 'ton-connect'
     });
 
-    function handleTask(taskType) {
-      // Ad execution script will be added in Step 3 after creating your Monetag Zone ID
-      alert("Triggering task: " + taskType);
+    function watchRewardedAd() {
+      alert("Ad completed! You earned 100 B2B.");
+      balance += 100;
+      document.getElementById('balance').innerText = balance;
+    }
+
+    function handleTask(type) {
+      balance += 100;
+      document.getElementById('balance').innerText = balance;
+      alert("Task completed! +100 B2B");
     }
 
     function handleWithdrawal() {
@@ -89,7 +97,11 @@
         alert("Please connect your TON wallet first!");
         return;
       }
-      alert("Withdrawal requested for wallet: " + wallet);
+      if (balance < 20000) {
+        alert("Minimum balance for withdrawal is 20,000 B2B");
+        return;
+      }
+      alert("Withdrawal requested for address: " + wallet);
     }
   </script>
 </body>
