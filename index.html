@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
   <title>B2B Reward</title>
 
+  <!-- Monetag Vignette Script -->
   <script>(function(s){s.dataset.zone='11687896',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
   
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -72,12 +72,11 @@
     .task-details span { font-size: 12px; color: #a371f7; font-weight: bold; }
     .btn-task { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text-main); border-radius: 8px; padding: 6px 12px; font-weight: bold; font-size: 12px; cursor: pointer; }
     .btn-task.done { background: #238636; border-color: #238636; color: white; }
-
-    [dir="rtl"] .ad-badge { right: auto; left: 10px; }
   </style>
 </head>
 <body>
 
+  <!-- Top Bar -->
   <div class="top-bar">
     <select id="lang-select" class="select-dropdown" onchange="changeLanguage(this.value)">
       <option value="en">🇺🇸 English</option>
@@ -91,81 +90,90 @@
     <button class="theme-toggle" onclick="toggleTheme()"><span id="theme-icon">🌙</span></button>
   </div>
 
+  <!-- Balance Header -->
   <div class="card">
-    <div class="balance-label" id="txt-your-balance">Your Balance</div>
+    <div class="balance-label">Your Balance</div>
     <div class="balance-val"><span id="balance">0</span> B2B</div>
     <div class="usdt-val">≈ $<span id="usdt-val">0.00</span> USDT</div>
 
     <div class="action-row">
-      <button class="btn-action btn-purple" id="txt-btn-earn">⚡ Earn</button>
-      <button class="btn-action btn-dark" id="txt-btn-withdraw" onclick="handleWithdrawal()">💳 Withdraw</button>
+      <button class="btn-action btn-purple">⚡ Earn</button>
+      <button class="btn-action btn-dark" onclick="handleWithdrawal()">💳 Withdraw</button>
     </div>
   </div>
 
   <div id="ton-connect" style="display: flex; justify-content: center; margin-bottom: 16px;"></div>
 
+  <!-- Daily Check-In Card -->
+  <div class="ad-card" style="border: 1px solid #8957e5;">
+    <span class="ad-badge" style="background: #8957e5;">STREAK</span>
+    <div class="ad-flex">
+      <div class="ad-info">
+        <h4>DAILY CHECK-IN</h4>
+        <p>🔥 Streak: <span id="streak-days">0</span>/7 Days (+50 B2B daily, +200 bonus on Day 7)</p>
+      </div>
+      <button id="checkin-btn" class="btn-watch" style="background: #8957e5;" onclick="claimDailyCheckIn()">Claim</button>
+    </div>
+  </div>
+
+  <!-- Referral Banner Card -->
+  <div class="ad-card" style="border: 1px solid #388bfd;">
+    <span class="ad-badge" style="background: #388bfd;">INVITE</span>
+    <div class="ad-flex">
+      <div class="ad-info">
+        <h4>REFER FRIENDS</h4>
+        <p>👥 Earn +150 B2B per active invite</p>
+      </div>
+      <button id="ref-btn" class="btn-watch" style="background: #388bfd;" onclick="copyReferralLink()">Invite</button>
+    </div>
+  </div>
+
+  <!-- Stats Grid -->
   <div class="stats-grid">
     <div class="stat-box">
-      <div class="stat-title" id="txt-stat-tasks">Tasks</div>
-      <div class="stat-num" id="task-progress">0/2</div>
+      <div class="stat-title">Tasks</div>
+      <div class="stat-num" id="task-progress">0/0</div>
     </div>
     <div class="stat-box">
-      <div class="stat-title" id="txt-stat-daily">Daily Ads</div>
+      <div class="stat-title">Daily Ads</div>
       <div class="stat-num"><span id="daily-count">0</span>/40</div>
     </div>
     <div class="stat-box">
-      <div class="stat-title" id="txt-stat-unlimited">Unlimited</div>
+      <div class="stat-title">Unlimited</div>
       <div class="stat-num" id="unlimited-count">0</div>
     </div>
   </div>
 
-  <div class="section-title" id="txt-title-ads">💰 Watch Ads & Earn</div>
+  <!-- Watch Ads Section -->
+  <div class="section-title">💰 Watch Ads & Earn</div>
 
+  <!-- Daily Ads Card -->
   <div class="ad-card">
-    <span class="ad-badge" id="txt-badge-daily">DAILY</span>
+    <span class="ad-badge">DAILY</span>
     <div class="ad-flex">
       <div class="ad-info">
-        <h4 id="txt-daily-ad-title">WATCH AD (40 DAILY)</h4>
-        <p>💎 +100 B2B per ad</p>
+        <h4>WATCH AD (40 DAILY)</h4>
+        <p>💎 +50 B2B per ad (5s cooldown)</p>
       </div>
       <button id="daily-ad-btn" class="btn-watch" onclick="watchDailyAd()">Watch</button>
     </div>
   </div>
 
+  <!-- Unlimited Ads Card -->
   <div class="ad-card">
-    <span class="ad-badge" style="background: #a371f7;" id="txt-badge-unlimited">UNLIMITED</span>
+    <span class="ad-badge" style="background: #a371f7;">UNLIMITED</span>
     <div class="ad-flex">
       <div class="ad-info">
-        <h4 id="txt-unlimited-ad-title">SPECIAL AD TASK</h4>
+        <h4>SPECIAL AD TASK</h4>
         <p>💎 +50 B2B per ad</p>
       </div>
       <button id="unlimited-ad-btn" class="btn-watch" onclick="watchUnlimitedAd()">Watch</button>
     </div>
   </div>
 
-  <div class="section-title" id="txt-title-tasks">✨ Featured Tasks</div>
-
-  <div class="task-row">
-    <div class="task-left">
-      <div class="task-icon">𝕏</div>
-      <div class="task-details">
-        <h5 id="txt-task1-title">Follow Official X Account</h5>
-        <span>+200 B2B</span>
-      </div>
-    </div>
-    <button id="task1-btn" class="btn-task" onclick="handleTaskFlow('task1-btn', 'https://x.com/YourHandle', 200)">Start →</button>
-  </div>
-
-  <div class="task-row">
-    <div class="task-left">
-      <div class="task-icon">💬</div>
-      <div class="task-details">
-        <h5 id="txt-task2-title">Retweet & Comment Post</h5>
-        <span>+200 B2B</span>
-      </div>
-    </div>
-    <button id="task2-btn" class="btn-task" onclick="handleTaskFlow('task2-btn', 'https://x.com/YourHandle/status/123456789', 200)">Start →</button>
-  </div>
+  <!-- Dynamic Social Tasks Section -->
+  <div class="section-title">✨ Social Tasks</div>
+  <div id="social-tasks-container"></div>
 
   <script>
     const SUPABASE_URL = 'https://drfbjrbleuyjunxzjsae.supabase.co';
@@ -180,96 +188,209 @@
     let userBalance = 0;
     let dailyAdCount = 0;
     let unlimitedAdCount = 0;
+    let completedTasksCount = 0;
+    let socialTasks = [];
     const taskStates = {};
 
-    const translations = {
-      en: {
-        yourBalance: "Your Balance", earn: "⚡ Earn", withdraw: "💳 Withdraw", tasks: "Tasks",
-        dailyAds: "Daily Ads", unlimited: "Unlimited", titleAds: "💰 Watch Ads & Earn",
-        dailyBadge: "DAILY", dailyAdTitle: "WATCH AD (40 DAILY)", unlimitedBadge: "UNLIMITED",
-        unlimitedAdTitle: "SPECIAL AD TASK", titleTasks: "✨ Featured Tasks",
-        task1Title: "Follow Official X Account", task2Title: "Retweet & Comment Post",
-        watch: "Watch", start: "Start →", claim: "Claim"
-      },
-      ru: {
-        yourBalance: "Ваш баланс", earn: "⚡ Заработать", withdraw: "💳 Вывести", tasks: "Задания",
-        dailyAds: "Дневные рекламы", unlimited: "Безлимитные", titleAds: "💰 Смотреть рекламу",
-        dailyBadge: "ЕЖЕДНЕВНО", dailyAdTitle: "СМОТРЕТЬ РЕКЛАМУ (40 В ДЕНЬ)", unlimitedBadge: "БЕЗЛИМИТНО",
-        unlimitedAdTitle: "СПЕЦИАЛЬНАЯ РЕКЛАМА", titleTasks: "✨ Задания",
-        task1Title: "Подписаться на X (Twitter)", task2Title: "Ретвитнуть и прокомментировать",
-        watch: "Смотреть", start: "Начать →", claim: "Забрать"
-      },
-      es: {
-        yourBalance: "Tu Saldo", earn: "⚡ Ganar", withdraw: "💳 Retirar", tasks: "Tareas",
-        dailyAds: "Anuncios Diarios", unlimited: "Ilimitado", titleAds: "💰 Ver Anuncios y Ganar",
-        dailyBadge: "DIARIO", dailyAdTitle: "VER ANUNCIO (40 DIARIOS)", unlimitedBadge: "ILIMITADO",
-        unlimitedAdTitle: "TAREA ESPECIAL DE ANUNCIO", titleTasks: "✨ Tareas Destacadas",
-        task1Title: "Seguir en X (Twitter)", task2Title: "Retweetear y Comentar",
-        watch: "Ver", start: "Empezar →", claim: "Reclamar"
-      },
-      hi: {
-        yourBalance: "आपका बैलेंस", earn: "⚡ कमाएं", withdraw: "💳 निकालें", tasks: "कार्य",
-        dailyAds: "दैनिक विज्ञापन", unlimited: "असीमित", titleAds: "💰 विज्ञापन देखें और कमाएं",
-        dailyBadge: "दैनिक", dailyAdTitle: "विज्ञापन देखें (40 दैनिक)", unlimitedBadge: "असीमित",
-        unlimitedAdTitle: "विशेष विज्ञापन कार्य", titleTasks: "✨ प्रमुख कार्य",
-        task1Title: "आधिकारिक X खाते को फॉलो करें", task2Title: "रीट्वीट और कमेंट करें",
-        watch: "देखें", start: "शुरू करें →", claim: "दावा करें"
-      },
-      ar: {
-        yourBalance: "رصيدك", earn: "⚡ كسب", withdraw: "💳 سحب", tasks: "المهام",
-        dailyAds: "إعلانات يومية", unlimited: "غير محدود", titleAds: "💰 شاهد الإعلانات واكسب",
-        dailyBadge: "يومي", dailyAdTitle: "شاهد الإعلان (40 يومياً)", unlimitedBadge: "غير محدود",
-        unlimitedAdTitle: "مهمة إعلانية خاصة", titleTasks: "✨ المهام المميزة",
-        task1Title: "متابعة الحساب الرسمي على X", task2Title: "إعادة تغريد والتعليق",
-        watch: "مشاهدة", start: "ابدأ ←", claim: "مطالبة"
-      },
-      id: {
-        yourBalance: "Saldo Anda", earn: "⚡ Hasilkan", withdraw: "💳 Penarikan", tasks: "Tugas",
-        dailyAds: "Iklan Harian", unlimited: "Tanpa Batas", titleAds: "💰 Tonton Iklan & Hasilkan",
-        dailyBadge: "HARIAN", dailyAdTitle: "TONTON IKLAN (40 HARIAN)", unlimitedBadge: "TANPA BATAS",
-        unlimitedAdTitle: "TUGAS IKLAN KHUSUS", titleTasks: "✨ Tugas Unggulan",
-        task1Title: "Ikuti Akun Resmi X", task2Title: "Retweet & Komentar Posting",
-        watch: "Tonton", start: "Mulai →", claim: "Klaim"
-      },
-      fr: {
-        yourBalance: "Votre Solde", earn: "⚡ Gagner", withdraw: "💳 Retirer", tasks: "Missions",
-        dailyAds: "Publicités Du Jour", unlimited: "Illimité", titleAds: "💰 Regarder des Pubs & Gagner",
-        dailyBadge: "QUOTIDIEN", dailyAdTitle: "REGARDER PUB (40 PAR JOUR)", unlimitedBadge: "ILLIMITÉ",
-        unlimitedAdTitle: "MISSION PUB SPÉCIALE", titleTasks: "✨ Missions Vedettes",
-        task1Title: "Suivre le compte officiel X", task2Title: "Retweeter & Commenter",
-        watch: "Voir", start: "Lancer →", claim: "Réclamer"
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl: 'https://b2-b-reward.vercel.app/tonconnect-manifest.json',
+      buttonRootId: 'ton-connect'
+    });
+
+    async function fetchAndRenderSocialTasks() {
+      const container = document.getElementById('social-tasks-container');
+      container.innerHTML = '<p style="text-align:center; color: var(--text-sub);">Loading tasks...</p>';
+
+      try {
+        let { data, error } = await supabaseClient
+          .from('tasks')
+          .select('*')
+          .order('created_at', { ascending: true });
+
+        if (error) throw error;
+
+        socialTasks = data || [];
+        container.innerHTML = '';
+
+        if (socialTasks.length === 0) {
+          container.innerHTML = '<p style="text-align:center; color: var(--text-sub);">No active social tasks.</p>';
+          return;
+        }
+
+        socialTasks.forEach(t => {
+          container.innerHTML += `
+            <div class="task-row">
+              <div class="task-left">
+                <div class="task-icon">${t.icon}</div>
+                <div class="task-details">
+                  <h5>${t.title}</h5>
+                  <span>+${t.points} B2B</span>
+                </div>
+              </div>
+              <button id="btn-${t.id}" class="btn-task" onclick="handleTaskFlow('btn-${t.id}', '${t.url}', ${t.points})">Start →</button>
+            </div>
+          `;
+        });
+
+        document.getElementById('task-progress').innerText = `${completedTasksCount}/${socialTasks.length}`;
+      } catch (err) {
+        console.error('Error loading social tasks:', err);
+        container.innerHTML = '<p style="text-align:center; color: #f85149;">Failed to load tasks.</p>';
       }
-    };
-
-    let currentLang = localStorage.getItem('app_lang') || (user?.language_code && translations[user.language_code] ? user.language_code : 'en');
-
-    function applyLanguage(lang) {
-      currentLang = lang;
-      localStorage.setItem('app_lang', lang);
-      document.getElementById('lang-select').value = lang;
-      const t = translations[lang] || translations.en;
-
-      document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
-      document.getElementById('txt-your-balance').innerText = t.yourBalance;
-      document.getElementById('txt-btn-earn').innerText = t.earn;
-      document.getElementById('txt-btn-withdraw').innerText = t.withdraw;
-      document.getElementById('txt-stat-tasks').innerText = t.tasks;
-      document.getElementById('txt-stat-daily').innerText = t.dailyAds;
-      document.getElementById('txt-stat-unlimited').innerText = t.unlimited;
-      document.getElementById('txt-title-ads').innerText = t.titleAds;
-      document.getElementById('txt-badge-daily').innerText = t.dailyBadge;
-      document.getElementById('txt-daily-ad-title').innerText = t.dailyAdTitle;
-      document.getElementById('txt-badge-unlimited').innerText = t.unlimitedBadge;
-      document.getElementById('txt-unlimited-ad-title').innerText = t.unlimitedAdTitle;
-      document.getElementById('txt-title-tasks').innerText = t.titleTasks;
-      document.getElementById('txt-task1-title').innerText = t.task1Title;
-      document.getElementById('txt-task2-title').innerText = t.task2Title;
-
-      if (!document.getElementById('daily-ad-btn').disabled) document.getElementById('daily-ad-btn').innerText = t.watch;
-      if (!document.getElementById('unlimited-ad-btn').disabled) document.getElementById('unlimited-ad-btn').innerText = t.watch;
     }
 
-    function changeLanguage(lang) { applyLanguage(lang); }
+    async function initUser() {
+      checkDailyCheckInStatus();
+      await fetchAndRenderSocialTasks();
+
+      try {
+        let { data, error } = await supabaseClient
+          .from('users')
+          .select('*')
+          .eq('telegram_id', telegramId)
+          .single();
+
+        if (error && error.code === 'PGRST116') {
+          const { data: newUser } = await supabaseClient
+            .from('users')
+            .insert([{ telegram_id: telegramId, balance: 0 }])
+            .select().single();
+          data = newUser;
+        }
+
+        userBalance = data ? data.balance : 0;
+        updateUI();
+      } catch (err) {
+        console.error('Error initializing user:', err);
+      }
+    }
+
+    function checkDailyCheckInStatus() {
+      const lastDate = localStorage.getItem('last_checkin_date');
+      let streak = parseInt(localStorage.getItem('streak_days') || '0');
+      const today = new Date().toDateString();
+
+      document.getElementById('streak-days').innerText = streak;
+
+      if (lastDate === today) {
+        const btn = document.getElementById('checkin-btn');
+        btn.disabled = true;
+        btn.innerText = 'Claimed ✓';
+        btn.style.background = '#21262d';
+      }
+    }
+
+    function claimDailyCheckIn() {
+      const today = new Date().toDateString();
+      let streak = parseInt(localStorage.getItem('streak_days') || '0');
+      
+      streak = (streak % 7) + 1;
+      let reward = 50;
+
+      if (streak === 7) {
+        reward += 200;
+        alert('🎉 7-Day Streak Complete! +200 B2B Bonus Awarded!');
+      } else {
+        alert(`Daily check-in claimed! +50 B2B (Day ${streak})`);
+      }
+
+      localStorage.setItem('last_checkin_date', today);
+      localStorage.setItem('streak_days', streak);
+      document.getElementById('streak-days').innerText = streak;
+
+      updateBalance(reward);
+      const btn = document.getElementById('checkin-btn');
+      btn.disabled = true;
+      btn.innerText = 'Claimed ✓';
+      btn.style.background = '#21262d';
+    }
+
+    function watchDailyAd() {
+      if (dailyAdCount >= 40) {
+        alert("Daily limit of 40 ads reached!");
+        return;
+      }
+      triggerAdWithVerification('daily-ad-btn', 50, () => {
+        dailyAdCount++;
+        document.getElementById('daily-count').innerText = dailyAdCount;
+      });
+    }
+
+    function watchUnlimitedAd() {
+      triggerAdWithVerification('unlimited-ad-btn', 50, () => {
+        unlimitedAdCount++;
+        document.getElementById('unlimited-count').innerText = unlimitedAdCount;
+      });
+    }
+
+    function triggerAdWithVerification(btnId, rewardAmount, callback) {
+      const btn = document.getElementById(btnId);
+      btn.disabled = true;
+      let secondsLeft = 5;
+      btn.innerText = `Wait (${secondsLeft}s)...`;
+
+      if (typeof show_11687896 === 'function') {
+        try { show_11687896(); } catch (e) { console.log(e); }
+      }
+
+      const interval = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft > 0) {
+          btn.innerText = `Wait (${secondsLeft}s)...`;
+        } else {
+          clearInterval(interval);
+          btn.disabled = false;
+          btn.innerText = 'Watch';
+          updateBalance(rewardAmount);
+          callback();
+        }
+      }, 1000);
+    }
+
+    function handleTaskFlow(btnId, targetUrl, reward) {
+      const btn = document.getElementById(btnId);
+      const currentState = taskStates[btnId] || 'start';
+
+      if (currentState === 'start') {
+        window.open(targetUrl, '_blank');
+        taskStates[btnId] = 'claim';
+        btn.innerText = 'Claim';
+        btn.style.background = '#8957e5';
+      } else if (currentState === 'claim') {
+        updateBalance(reward);
+        taskStates[btnId] = 'done';
+        btn.innerText = '✓';
+        btn.classList.add('done');
+        btn.disabled = true;
+        completedTasksCount++;
+        updateUI();
+      }
+    }
+
+    function copyReferralLink() {
+      const refLink = `https://t.me/B2BRewardbot/app?startapp=${telegramId}`;
+      navigator.clipboard.writeText(refLink);
+      alert('Referral link copied! Earn +150 B2B for every user who joins.');
+    }
+
+    function updateUI() {
+      document.getElementById('balance').innerText = userBalance.toLocaleString();
+      document.getElementById('usdt-val').innerText = (userBalance / 10000).toFixed(4);
+      document.getElementById('task-progress').innerText = `${completedTasksCount}/${socialTasks.length}`;
+    }
+
+    async function updateBalance(amountToAdd) {
+      userBalance += amountToAdd;
+      updateUI();
+      await supabaseClient.from('users').update({ balance: userBalance }).eq('telegram_id', telegramId);
+    }
+
+    function handleWithdrawal() {
+      const wallet = tonConnectUI.account?.address;
+      if (!wallet) return alert("Please connect your TON wallet first!");
+      if (userBalance < 20000) return alert("Minimum balance for withdrawal is 20,000 B2B");
+      alert("Withdrawal requested for address: " + wallet);
+    }
 
     function toggleTheme() {
       const isLight = document.body.getAttribute('data-theme') === 'light';
@@ -282,157 +403,6 @@
         document.getElementById('theme-icon').innerText = '☀️';
         localStorage.setItem('app_theme', 'light');
       }
-    }
-
-    const savedTheme = localStorage.getItem('app_theme');
-    if (savedTheme === 'light') {
-      document.body.setAttribute('data-theme', 'light');
-      document.getElementById('theme-icon').innerText = '☀️';
-    }
-
-    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-      manifestUrl: 'https://b2-b-reward.vercel.app/tonconnect-manifest.json',
-      buttonRootId: 'ton-connect'
-    });
-
-    async function initUser() {
-      applyLanguage(currentLang);
-      try {
-        let { data, error } = await supabaseClient
-          .from('users')
-          .select('*')
-          .eq('telegram_id', telegramId)
-          .single();
-
-        if (error && error.code === 'PGRST116') {
-          const { data: newUser, error: createError } = await supabaseClient
-            .from('users')
-            .insert([{ telegram_id: telegramId, balance: 0 }])
-            .select()
-            .single();
-
-          if (createError) throw createError;
-          data = newUser;
-        }
-
-        userBalance = data ? data.balance : 0;
-        updateUI();
-      } catch (err) {
-        console.error('Error initializing user:', err);
-      }
-    }
-
-    function updateUI() {
-      document.getElementById('balance').innerText = userBalance.toLocaleString();
-      document.getElementById('usdt-val').innerText = (userBalance / 10000).toFixed(4);
-    }
-
-    async function updateBalance(amountToAdd) {
-      userBalance += amountToAdd;
-      updateUI();
-
-      await supabaseClient
-        .from('users')
-        .update({ balance: userBalance })
-        .eq('telegram_id', telegramId);
-    }
-
-    function startCountdown(buttonId, defaultText, callback) {
-      const btn = document.getElementById(buttonId);
-      btn.disabled = true;
-      let seconds = 5;
-      
-      const timer = setInterval(() => {
-        btn.innerText = `${seconds}s`;
-        seconds--;
-        if (seconds < 0) {
-          clearInterval(timer);
-          btn.disabled = false;
-          btn.innerText = defaultText;
-          if (callback) callback();
-        }
-      }, 1000);
-    }
-
-    function triggerVignetteAd(onComplete) {
-      if (typeof show_11687896 === 'function') {
-        show_11687896().then(() => {
-          onComplete();
-        }).catch((err) => {
-          console.error("Vignette ad error:", err);
-          onComplete();
-        });
-      } else {
-        onComplete();
-      }
-    }
-
-    function watchDailyAd() {
-      if (dailyAdCount >= 40) {
-        alert("Daily limit of 40 ads reached!");
-        return;
-      }
-
-      triggerVignetteAd(processDailyAdReward);
-    }
-
-    function processDailyAdReward() {
-      dailyAdCount++;
-      document.getElementById('daily-count').innerText = dailyAdCount;
-      updateBalance(100);
-      const t = translations[currentLang] || translations.en;
-      
-      if (dailyAdCount < 40) {
-        startCountdown('daily-ad-btn', t.watch);
-      } else {
-        const btn = document.getElementById('daily-ad-btn');
-        btn.disabled = true;
-        btn.innerText = 'Done';
-      }
-    }
-
-    function watchUnlimitedAd() {
-      triggerVignetteAd(processUnlimitedAdReward);
-    }
-
-    function processUnlimitedAdReward() {
-      unlimitedAdCount++;
-      document.getElementById('unlimited-count').innerText = unlimitedAdCount;
-      updateBalance(50);
-      const t = translations[currentLang] || translations.en;
-      startCountdown('unlimited-ad-btn', t.watch);
-    }
-
-    function handleTaskFlow(btnId, targetUrl, reward) {
-      const btn = document.getElementById(btnId);
-      const currentState = taskStates[btnId] || 'start';
-      const t = translations[currentLang] || translations.en;
-
-      if (currentState === 'start') {
-        window.open(targetUrl, '_blank');
-        taskStates[btnId] = 'claim';
-        btn.innerText = t.claim;
-        btn.style.background = '#8957e5';
-      } else if (currentState === 'claim') {
-        updateBalance(reward);
-        taskStates[btnId] = 'done';
-        btn.innerText = '✓';
-        btn.classList.add('done');
-        btn.disabled = true;
-      }
-    }
-
-    function handleWithdrawal() {
-      const wallet = tonConnectUI.account?.address;
-      if (!wallet) {
-        alert("Please connect your TON wallet first!");
-        return;
-      }
-      if (userBalance < 20000) {
-        alert("Minimum balance for withdrawal is 20,000 B2B");
-        return;
-      }
-      alert("Withdrawal requested for address: " + wallet);
     }
 
     initUser();
