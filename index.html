@@ -18,6 +18,9 @@
   <!-- Monetag Ad Tag -->
   <script src="https://quge5.com/88/tag.min.js" data-zone="274553" async data-cfasync="false"></script>
 
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     body {
       background-color: #0f172a;
@@ -55,7 +58,7 @@
   <h1>B2B Reward</h1>
   
   <div class="card">
-    <h3>Balance: <span id="balance">0</span> B2B</h3>
+    <h3>Balance: <span id="balance">Loading...</span> B2B</h3>
     <p style="font-size: 12px; color: #94a3b8;">Minimum payout: 20,000 B2B ($10)</p>
   </div>
 
@@ -72,39 +75,91 @@
   </div>
 
   <script>
+    const SUPABASE_URL = 'https://drfbjrbleuyjunxzjsae.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyZmJqcmJmZXV5anVueHpqc2FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNDQzODUsImV4cCI6MjEwMzYyMDM4NX0.XMn6B-o6_Qbtwp1aYQIl0vOLKvNTN2irPO47hEtoVSE';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    let balance = 0;
+    const user = tg.initDataUnsafe?.user;
+    const telegramId = user?.id ? String(user.id) : 'test_user_123';
+    let userBalance = 0;
 
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
       manifestUrl: 'https://b2-b-reward.vercel.app/tonconnect-manifest.json',
       buttonRootId: 'ton-connect'
     });
 
+    // Initialize user in Supabase
+    async function initUser() {
+      try {
+        let { data, error } = await supabaseClient
+          .from('users')
+          .select('*')
+          .eq('telegram_id', telegramId)
+          .single();
+
+        if (error && error.code === 'PGRST116') {
+          const { data: newUser, error: createError } = await supabaseClient
+            .from('users')
+            .insert([{ telegram_id: telegramId, balance: 0 }])
+            .select()
+            .single();
+
+          if (createError) throw createError;
+          data = newUser;
+        }
+
+        userBalance = data ? data.balance : 0;
+        document.getElementById('balance').innerText = userBalance;
+      } catch (err) {
+        console.error('Error initializing user:', err);
+        document.getElementById('balance').innerText = '0';
+      }
+    }
+
+    // Sync balance changes to Supabase
+    async function updateBalance(amountToAdd) {
+      userBalance += amountToAdd;
+      document.getElementById('balance').innerText = userBalance;
+
+      await supabaseClient
+        .from('users')
+        .update({ balance: userBalance })
+        .eq('telegram_id', telegramId);
+    }
+
+    // Save TON Wallet address on connection
+    tonConnectUI.onStatusChange(async (wallet) => {
+      if (wallet) {
+        const address = wallet.account.address;
+        await supabaseClient
+          .from('users')
+          .update({ wallet_address: address })
+          .eq('telegram_id', telegramId);
+      }
+    });
+
     function watchRewardedAd() {
-      // Trigger ad call if available, otherwise credit reward
       if (typeof show_274553 !== 'undefined') {
         show_274553().then(() => {
-          balance += 100;
-          document.getElementById('balance').innerText = balance;
+          updateBalance(100);
           alert("Ad completed! You earned 100 B2B.");
         }).catch(() => {
-          balance += 100;
-          document.getElementById('balance').innerText = balance;
+          updateBalance(100);
           alert("Task completed! +100 B2B");
         });
       } else {
-        balance += 100;
-        document.getElementById('balance').innerText = balance;
+        updateBalance(100);
         alert("Ad Task Completed! +100 B2B");
       }
     }
 
     function handleTask(type) {
-      balance += 100;
-      document.getElementById('balance').innerText = balance;
-      alert("Task completed! +100 B2B");
+      const reward = type === 'social_task' ? 200 : 100;
+      updateBalance(reward);
+      alert(`Task completed! +${reward} B2B`);
     }
 
     function handleWithdrawal() {
@@ -113,12 +168,15 @@
         alert("Please connect your TON wallet first!");
         return;
       }
-      if (balance < 20000) {
+      if (userBalance < 20000) {
         alert("Minimum balance for withdrawal is 20,000 B2B");
         return;
       }
       alert("Withdrawal requested for address: " + wallet);
     }
+
+    // Initialize application state on load
+    initUser();
   </script>
 </body>
 </html>
