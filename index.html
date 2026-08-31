@@ -176,315 +176,295 @@
 
   <script>
     const SUPABASE_URL = 'https://drfbjrbleuyjunxzjsae.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyZmJqcmJmZXV5anVueHpqc2FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNDQzODUsImV4cCI6MjEwMzYyMDM4NX0.XMn6B-o6_Qbtwp1aYQIl0vOLKvNTN2irPO47hEtoVSE';
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyZmJqcmJmZXV5anVueHpqc2FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNDQzODUsImV4cCI6MjEwMzYyMDM4NX0.XMn6B-o6_Qbtwp1aYQIl0vOLKvNTN2irPO47hEtoVSE';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // LINE 147: Monetag Direct Link URL
-    const MONETAG_DIRECT_LINK = "https://omg10.com/4/11693106";
+const MONETAG_DIRECT_LINK = "https://omg10.com/4/11693106";
 
-    const tg = window.Telegram?.WebApp || {};
-    if (tg.expand) tg.expand();
+const tg = window.Telegram?.WebApp || {};
+if (tg.expand) tg.expand();
 
-    const user = tg.initDataUnsafe?.user;
-    const telegramId = user?.id ? String(user.id) : 'test_user_123';
-    let userBalance = 0;
-    let dailyAdCount = 0;
-    let unlimitedAdCount = 0;
-    let completedTasksCount = 0;
-    let socialTasks = [];
-    const taskStates = {};
+const user = tg.initDataUnsafe?.user;
+const telegramId = user?.id ? String(user.id) : 'test_user_123';
 
-    const DEFAULT_SOCIAL_TASKS = [
-      { id: 'x_1', title: 'Follow Maxit on X', icon: '𝕏', url: 'https://www.x.com/Maxit_official', points: 100 },
-      { id: 'fb_1', title: 'Follow Facebook Page 1', icon: '📘', url: 'https://www.facebook.com/share/1UGiF61DoX/', points: 100 },
-      { id: 'fb_2', title: 'Follow Facebook Page 2', icon: '📘', url: 'https://www.facebook.com/share/1HRazBLC41/', points: 100 },
-      { id: 'fb_post_1', title: 'Like & Comment on FB Post 1', icon: '👍', url: 'https://www.facebook.com/share/p/19EbFQR4MQ/', points: 100 },
-      { id: 'fb_post_2', title: 'Like & Comment on FB Post 2', icon: '👍', url: 'https://www.facebook.com/share/p/14w6j8XcBBu/', points: 100 },
-      { id: 'ig_1', title: 'Follow on Instagram', icon: '📸', url: 'https://www.instagram.com/maxitofficial2025', points: 100 },
-      { id: 'yt_ch_1', title: 'Subscribe: Script Detective', icon: '📺', url: 'https://youtube.com/@scriptdetective_4u?si=5bqqqZTvfLfwn3lf', points: 100 },
-      { id: 'yt_ch_2', title: 'Subscribe: Kashlink', icon: '📺', url: 'https://youtube.com/@kashlink6837?si=8389yiu20FEycVWY', points: 100 },
-      { id: 'yt_s_1', title: 'Like & Comment YouTube Short 1', icon: '▶️', url: 'https://youtube.com/shorts/mvKGqwzDA5w?si=TFCW8O7EST5BoBYZ', points: 100 },
-      { id: 'yt_s_2', title: 'Like & Comment YouTube Short 2', icon: '▶️', url: 'https://youtube.com/shorts/fKpTIOJFSZk?si=3yQeemQrtsy1neqk', points: 100 },
-      { id: 'yt_s_3', title: 'Like & Comment YouTube Short 3', icon: '▶️', url: 'https://youtube.com/shorts/L8xHjg7SQ4c?si=htUvL9VgJJmcqPYP', points: 100 },
-      { id: 'yt_s_4', title: 'Like & Comment YouTube Short 4', icon: '▶️', url: 'https://youtube.com/shorts/upkk8UERLtk?si=wSKTc6RfdF4OZFes', points: 100 },
-      { id: 'tg_c_1', title: 'Join Telegram: Maxit001', icon: '📢', url: 'https://t.me/maxit001', points: 100 },
-      { id: 'tg_c_2', title: 'Join Telegram: Ogihtu', icon: '📢', url: 'https://t.me/ogihtu', points: 100 },
-      { id: 'tg_c_3', title: 'Join Telegram: Earnings Family', icon: '📢', url: 'https://t.me/earningsfamily9', points: 100 },
-      { id: 'tg_c_4', title: 'Join Telegram: B2B Reward Channel', icon: '📢', url: 'https://t.me/b2breward', points: 100 },
-      { id: 'tg_c_5', title: 'Join Telegram: B2B Official', icon: '📢', url: 'https://t.me/b2brewardofficial', points: 100 },
-      { id: 'tg_g_1', title: 'Join Telegram Group 1', icon: '💬', url: 'https://t.me/+5NtA9f4T0205MGI0', points: 100 },
-      { id: 'tg_g_2', title: 'Join Telegram Group 2', icon: '💬', url: 'https://t.me/+acEh3NkUu_A3MmVk', points: 100 },
-      { id: 'tg_g_3', title: 'Join Telegram Group 3', icon: '💬', url: 'https://t.me/+5w2BFuJydkU5MzI0', points: 100 },
-      { id: 'tg_g_4', title: 'Join Telegram Group 4', icon: '💬', url: 'https://t.me/+Y3T4911F_OcyMjJk', points: 100 },
-      { id: 'tg_g_5', title: 'Join Telegram Group 5', icon: '💬', url: 'https://t.me/+QQMK2wkd4ccxYmRk', points: 100 },
-      { id: 'tg_g_6', title: 'Join Telegram: Starlinks AI', icon: '💬', url: 'https://t.me/starlinks_ai', points: 100 },
-      { id: 'tg_g_7', title: 'Join Telegram Group 7', icon: '💬', url: 'https://t.me/+OAh6cygVYcMxZTU0', points: 100 }
-    ];
+let userData = {
+  telegram_id: telegramId,
+  balance: 0,
+  daily_ad_count: 0,
+  unlimited_ad_count: 0,
+  last_checkin_date: '',
+  streak_days: 0,
+  task_states: {}
+};
 
-    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-      manifestUrl: 'https://b2-b-reward.vercel.app/tonconnect-manifest.json',
-      buttonRootId: 'ton-connect'
-    });
+let socialTasks = [];
 
-    function triggerFullScreenAd(btnId, callback) {
-      const btn = document.getElementById(btnId);
-      if (btn) btn.disabled = true;
+const DEFAULT_SOCIAL_TASKS = [
+  { id: 'x_1', title: 'Follow Maxit on X', icon: '𝕏', url: 'https://www.x.com/Maxit_official', points: 100 },
+  { id: 'fb_1', title: 'Follow Facebook Page 1', icon: '📘', url: 'https://www.facebook.com/share/1UGiF61DoX/', points: 100 },
+  { id: 'fb_2', title: 'Follow Facebook Page 2', icon: '📘', url: 'https://www.facebook.com/share/1HRazBLC41/', points: 100 },
+  { id: 'fb_post_1', title: 'Like & Comment on FB Post 1', icon: '👍', url: 'https://www.facebook.com/share/p/19EbFQR4MQ/', points: 100 },
+  { id: 'fb_post_2', title: 'Like & Comment on FB Post 2', icon: '👍', url: 'https://www.facebook.com/share/p/14w6j8XcBBu/', points: 100 },
+  { id: 'ig_1', title: 'Follow on Instagram', icon: '📸', url: 'https://www.instagram.com/maxitofficial2025', points: 100 },
+  { id: 'yt_ch_1', title: 'Subscribe: Script Detective', icon: '📺', url: 'https://youtube.com/@scriptdetective_4u?si=5bqqqZTvfLfwn3lf', points: 100 },
+  { id: 'yt_ch_2', title: 'Subscribe: Kashlink', icon: '📺', url: 'https://youtube.com/@kashlink6837?si=8389yiu20FEycVWY', points: 100 },
+  { id: 'yt_s_1', title: 'Like & Comment YouTube Short 1', icon: '▶️', url: 'https://youtube.com/shorts/mvKGqwzDA5w?si=TFCW8O7EST5BoBYZ', points: 100 },
+  { id: 'yt_s_2', title: 'Like & Comment YouTube Short 2', icon: '▶️', url: 'https://youtube.com/shorts/fKpTIOJFSZk?si=3yQeemQrtsy1neqk', points: 100 },
+  { id: 'yt_s_3', title: 'Like & Comment YouTube Short 3', icon: '▶️', url: 'https://youtube.com/shorts/L8xHjg7SQ4c?si=htUvL9VgJJmcqPYP', points: 100 },
+  { id: 'yt_s_4', title: 'Like & Comment YouTube Short 4', icon: '▶️', url: 'https://youtube.com/shorts/upkk8UERLtk?si=wSKTc6RfdF4OZFes', points: 100 },
+  { id: 'tg_c_1', title: 'Join Telegram: Maxit001', icon: '📢', url: 'https://t.me/maxit001', points: 100 },
+  { id: 'tg_c_2', title: 'Join Telegram: Ogihtu', icon: '📢', url: 'https://t.me/ogihtu', points: 100 },
+  { id: 'tg_c_3', title: 'Join Telegram: Earnings Family', icon: '📢', url: 'https://t.me/earningsfamily9', points: 100 },
+  { id: 'tg_c_4', title: 'Join Telegram: B2B Reward Channel', icon: '📢', url: 'https://t.me/b2breward', points: 100 },
+  { id: 'tg_c_5', title: 'Join Telegram: B2B Official', icon: '📢', url: 'https://t.me/b2brewardofficial', points: 100 },
+  { id: 'tg_g_1', title: 'Join Telegram Group 1', icon: '💬', url: 'https://t.me/+5NtA9f4T0205MGI0', points: 100 },
+  { id: 'tg_g_2', title: 'Join Telegram Group 2', icon: '💬', url: 'https://t.me/+acEh3NkUu_A3MmVk', points: 100 },
+  { id: 'tg_g_3', title: 'Join Telegram Group 3', icon: '💬', url: 'https://t.me/+5w2BFuJydkU5MzI0', points: 100 },
+  { id: 'tg_g_4', title: 'Join Telegram Group 4', icon: '💬', url: 'https://t.me/+Y3T4911F_OcyMjJk', points: 100 },
+  { id: 'tg_g_5', title: 'Join Telegram Group 5', icon: '💬', url: 'https://t.me/+QQMK2wkd4ccxYmRk', points: 100 },
+  { id: 'tg_g_6', title: 'Join Telegram: Starlinks AI', icon: '💬', url: 'https://t.me/starlinks_ai', points: 100 },
+  { id: 'tg_g_7', title: 'Join Telegram Group 7', icon: '💬', url: 'https://t.me/+OAh6cygVYcMxZTU0', points: 100 }
+];
 
-      if (typeof window.show_11691092 === 'function') {
-        window.show_11691092()
-          .then(() => {
-            runCountdownAndReward(btnId, callback);
-          })
-          .catch((err) => {
-            console.warn("Rewarded ad failed or was closed early:", err);
-            executeFallback(btnId, callback);
-          });
-      } else {
-        console.warn("Monetag script not available. Running fallback.");
-        executeFallback(btnId, callback);
-      }
+const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+  manifestUrl: 'https://b2-b-reward.vercel.app/tonconnect-manifest.json',
+  buttonRootId: 'ton-connect'
+});
+
+async function initUser() {
+  await loadUserDataFromSupabase();
+  await fetchAndRenderSocialTasks();
+  checkDailyCheckInStatus();
+  updateUI();
+}
+
+async function loadUserDataFromSupabase() {
+  try {
+    let { data, error } = await supabaseClient
+      .from('users')
+      .select('*')
+      .eq('telegram_id', telegramId)
+      .maybeSingle();
+
+    if (data) {
+      userData = { ...userData, ...data };
+      if (!userData.task_states) userData.task_states = {};
+    } else {
+      await saveUserDataToSupabase();
     }
+  } catch (err) {
+    console.error("Error loading user data:", err);
+  }
+}
 
-    function executeFallback(btnId, callback) {
-      if (MONETAG_DIRECT_LINK && !MONETAG_DIRECT_LINK.includes("your-monetag-direct-link-url-here")) {
-        if (tg.openLink) {
-          tg.openLink(MONETAG_DIRECT_LINK);
-        } else {
-          window.open(MONETAG_DIRECT_LINK, '_blank');
-        }
-      }
-      runCountdownAndReward(btnId, callback);
-    }
+async function saveUserDataToSupabase() {
+  try {
+    await supabaseClient.from('users').upsert(userData, { onConflict: 'telegram_id' });
+  } catch (err) {
+    console.error("Failed to save cloud data:", err);
+  }
+}
 
-    function runCountdownAndReward(btnId, callback) {
-      const btn = document.getElementById(btnId);
-      let secondsLeft = 5;
-      if (btn) btn.innerText = `Wait (${secondsLeft}s)...`;
-
-      const interval = setInterval(() => {
-        secondsLeft--;
-        if (secondsLeft > 0) {
-          if (btn) btn.innerText = `Wait (${secondsLeft}s)...`;
-        } else {
-          clearInterval(interval);
-          if (btn) btn.disabled = false;
-          callback();
-        }
-      }, 1000);
-    }
-
-    async function fetchAndRenderSocialTasks() {
-      const container = document.getElementById('social-tasks-container');
-      container.innerHTML = '<p style="text-align:center; color: var(--text-sub);">Loading tasks...</p>';
-
-      try {
-        let { data, error } = await supabaseClient
-          .from('tasks')
-          .select('*')
-          .order('created_at', { ascending: true });
-
-        if (!error && data && data.length > 0) {
-          socialTasks = data;
-        } else {
-          socialTasks = DEFAULT_SOCIAL_TASKS;
-        }
-      } catch (err) {
-        console.warn('Using default tasks array:', err);
-        socialTasks = DEFAULT_SOCIAL_TASKS;
-      }
-
-      renderSocialTasks(container);
-    }
-
-    function renderSocialTasks(container) {
-      container.innerHTML = '';
-
-      socialTasks.forEach(t => {
-        container.innerHTML += `
-          <div class="task-row">
-            <div class="task-left">
-              <div class="task-icon">${t.icon || '✨'}</div>
-              <div class="task-details">
-                <h5>${t.title}</h5>
-                <span>+${t.points} B2B</span>
-              </div>
-            </div>
-            <button id="btn-${t.id}" class="btn-task" onclick="handleTaskFlow('btn-${t.id}', '${t.url}', ${t.points})">Start →</button>
-          </div>
-        `;
-      });
-
-      document.getElementById('task-progress').innerText = `${completedTasksCount}/${socialTasks.length}`;
-    }
-
-    async function initUser() {
-      checkDailyCheckInStatus();
-      await fetchAndRenderSocialTasks();
-
-      try {
-        let { data, error } = await supabaseClient
-          .from('users')
-          .select('*')
-          .eq('telegram_id', telegramId)
-          .single();
-
-        if (error && error.code === 'PGRST116') {
-          const { data: newUser } = await supabaseClient
-            .from('users')
-            .insert([{ telegram_id: telegramId, balance: 0 }])
-            .select().single();
-          data = newUser;
-        }
-
-        userBalance = data ? data.balance : 0;
-        updateUI();
-      } catch (err) {
-        console.error('Error initializing user:', err);
-      }
-    }
-
-    function checkDailyCheckInStatus() {
-      const lastDate = localStorage.getItem('last_checkin_date');
-      let streak = parseInt(localStorage.getItem('streak_days') || '0');
-      const today = new Date().toDateString();
-
-      document.getElementById('streak-days').innerText = streak;
-
-      if (lastDate === today) {
-        const btn = document.getElementById('checkin-btn');
-        if (btn) {
-          btn.disabled = true;
-          btn.innerText = 'Claimed ✓';
-          btn.style.background = '#21262d';
-        }
-      }
-    }
-
-    function claimDailyCheckIn() {
-      const wallet = tonConnectUI.account?.address;
-      if (!wallet) {
-        alert("⚠️ Please connect your TON wallet first to claim daily rewards!");
-        return;
-      }
-
-      triggerFullScreenAd('checkin-btn', () => {
-        const today = new Date().toDateString();
-        let streak = parseInt(localStorage.getItem('streak_days') || '0');
-        
-        streak = (streak % 7) + 1;
-        let reward = 50;
-
-        if (streak === 7) {
-          reward += 200;
-          alert('🎉 7-Day Streak Complete! +200 B2B Bonus Awarded!');
-        } else {
-          alert(`Daily check-in claimed! +50 B2B (Day ${streak})`);
-        }
-
-        localStorage.setItem('last_checkin_date', today);
-        localStorage.setItem('streak_days', streak);
-        document.getElementById('streak-days').innerText = streak;
-
-        updateBalance(reward);
-        const btn = document.getElementById('checkin-btn');
-        if (btn) {
-          btn.disabled = true;
-          btn.innerText = 'Claimed ✓';
-          btn.style.background = '#21262d';
-        }
-      });
-    }
-
-    function watchDailyAd() {
-      if (dailyAdCount >= 40) {
-        alert("Daily limit of 40 ads reached!");
-        return;
-      }
-      triggerFullScreenAd('daily-ad-btn', () => {
-        dailyAdCount++;
-        document.getElementById('daily-count').innerText = dailyAdCount;
-        updateBalance(50);
-        const btn = document.getElementById('daily-ad-btn');
-        if (btn) btn.innerText = 'Watch';
-      });
-    }
-
-    function watchUnlimitedAd() {
-      triggerFullScreenAd('unlimited-ad-btn', () => {
-        unlimitedAdCount++;
-        document.getElementById('unlimited-count').innerText = unlimitedAdCount;
-        updateBalance(50);
-        const btn = document.getElementById('unlimited-ad-btn');
-        if (btn) btn.innerText = 'Watch';
-      });
-    }
-
-    function handleTaskFlow(btnId, targetUrl, reward) {
-      const btn = document.getElementById(btnId);
-      const currentState = taskStates[btnId] || 'start';
-
-      if (currentState === 'start') {
-        if (tg.openLink) {
-          tg.openLink(targetUrl);
-        } else {
-          window.open(targetUrl, '_blank');
-        }
-        taskStates[btnId] = 'claim';
-        btn.innerText = 'Claim';
-        btn.style.background = '#8957e5';
-      } else if (currentState === 'claim') {
-        triggerFullScreenAd(btnId, () => {
-          updateBalance(reward);
-          taskStates[btnId] = 'done';
-          btn.innerText = '✓';
-          btn.classList.add('done');
-          btn.disabled = true;
-          completedTasksCount++;
-          updateUI();
-        });
-      }
-    }
-
-    function copyReferralLink() {
-      const refLink = `https://t.me/B2BRewardbot/app?startapp=${telegramId}`;
-      navigator.clipboard.writeText(refLink);
-      alert('Referral link copied! Earn +150 B2B for every user who joins.');
-    }
-
-    function updateUI() {
-  document.getElementById('balance').innerText = userData.balance.toLocaleString();
-  document.getElementById('daily-count').innerText = userData.daily_ad_count;
-  document.getElementById('unlimited-count').innerText = userData.unlimited_ad_count;
+function updateUI() {
+  document.getElementById('balance').innerText = (userData.balance || 0).toLocaleString();
+  document.getElementById('daily-count').innerText = userData.daily_ad_count || 0;
+  document.getElementById('unlimited-count').innerText = userData.unlimited_ad_count || 0;
   
-  const completedCount = Object.values(userData.task_states).filter(v => v === 'done').length;
+  const completedCount = Object.values(userData.task_states || {}).filter(v => v === 'done').length;
   document.getElementById('task-progress').innerText = `${completedCount}/${socialTasks.length}`;
+}
+
+function triggerFullScreenAd(btnId, callback) {
+  const btn = document.getElementById(btnId);
+  if (btn) btn.disabled = true;
+
+  if (typeof window.show_11691092 === 'function') {
+    window.show_11691092()
+      .then(() => runCountdownAndReward(btnId, callback))
+      .catch(() => executeFallback(btnId, callback));
+  } else {
+    executeFallback(btnId, callback);
+  }
+}
+
+function executeFallback(btnId, callback) {
+  if (MONETAG_DIRECT_LINK) {
+    if (tg.openLink) tg.openLink(MONETAG_DIRECT_LINK);
+    else window.open(MONETAG_DIRECT_LINK, '_blank');
+  }
+  runCountdownAndReward(btnId, callback);
+}
+
+function runCountdownAndReward(btnId, callback) {
+  const btn = document.getElementById(btnId);
+  let secondsLeft = 5;
+  if (btn) btn.innerText = `Wait (${secondsLeft}s)...`;
+
+  const interval = setInterval(() => {
+    secondsLeft--;
+    if (secondsLeft > 0) {
+      if (btn) btn.innerText = `Wait (${secondsLeft}s)...`;
+    } else {
+      clearInterval(interval);
+      if (btn) btn.disabled = false;
+      callback();
+    }
+  }, 1000);
+}
+
+async function fetchAndRenderSocialTasks() {
+  try {
+    let { data, error } = await supabaseClient.from('tasks').select('*').order('created_at', { ascending: true });
+    socialTasks = (data && data.length > 0) ? data : DEFAULT_SOCIAL_TASKS;
+  } catch (err) {
+    socialTasks = DEFAULT_SOCIAL_TASKS;
+  }
+  renderSocialTasks();
+}
+
+function renderSocialTasks() {
+  const container = document.getElementById('social-tasks-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  socialTasks.forEach(t => {
+    const btnId = `btn-${t.id}`;
+    const state = userData.task_states[btnId] || 'start';
+    const isDone = state === 'done';
+    const label = isDone ? '✓' : (state === 'claim' ? 'Claim' : 'Start →');
+    const style = state === 'claim' ? 'background: #8957e5;' : '';
+
+    container.innerHTML += `
+      <div class="task-row">
+        <div class="task-left">
+          <div class="task-icon">${t.icon || '✨'}</div>
+          <div class="task-details">
+            <h5>${t.title}</h5>
+            <span>+${t.points} B2B</span>
+          </div>
+        </div>
+        <button id="${btnId}" class="btn-task ${isDone ? 'done' : ''}" style="${style}" ${isDone ? 'disabled' : ''} onclick="handleTaskFlow('${btnId}', '${t.url}', ${t.points})">${label}</button>
+      </div>
+    `;
+  });
+}
+
+function checkDailyCheckInStatus() {
+  const today = new Date().toDateString();
+  document.getElementById('streak-days').innerText = userData.streak_days || 0;
+
+  if (userData.last_checkin_date === today) {
+    const btn = document.getElementById('checkin-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerText = 'Claimed ✓';
+      btn.style.background = '#21262d';
+    }
+  }
+}
+
+function claimDailyCheckIn() {
+  const wallet = tonConnectUI.account?.address;
+  if (!wallet) return alert("⚠️ Please connect your TON wallet first!");
+
+  triggerFullScreenAd('checkin-btn', () => {
+    const today = new Date().toDateString();
+    userData.streak_days = ((userData.streak_days || 0) % 7) + 1;
+    let reward = 50;
+
+    if (userData.streak_days === 7) {
+      reward += 200;
+      alert('🎉 7-Day Streak Complete! +200 B2B Bonus!');
+    } else {
+      alert(`Daily check-in claimed! +50 B2B (Day ${userData.streak_days})`);
+    }
+
+    userData.last_checkin_date = today;
+    userData.balance = (userData.balance || 0) + reward;
+
+    updateUI();
+    checkDailyCheckInStatus();
+    saveUserDataToSupabase();
+  });
+}
+
+function watchDailyAd() {
+  if (userData.daily_ad_count >= 40) return alert("Daily limit reached!");
+
+  triggerFullScreenAd('daily-ad-btn', () => {
+    userData.daily_ad_count = (userData.daily_ad_count || 0) + 1;
+    userData.balance = (userData.balance || 0) + 50;
+    
+    const btn = document.getElementById('daily-ad-btn');
+    if (btn) btn.innerText = 'Watch';
+    
+    updateUI();
+    saveUserDataToSupabase();
+  });
+}
+
+function watchUnlimitedAd() {
+  triggerFullScreenAd('unlimited-ad-btn', () => {
+    userData.unlimited_ad_count = (userData.unlimited_ad_count || 0) + 1;
+    userData.balance = (userData.balance || 0) + 50;
+    
+    const btn = document.getElementById('unlimited-ad-btn');
+    if (btn) btn.innerText = 'Watch';
+    
+    updateUI();
+    saveUserDataToSupabase();
+  });
+}
+
+function handleTaskFlow(btnId, targetUrl, reward) {
+  const currentState = userData.task_states[btnId] || 'start';
+
+  if (currentState === 'start') {
+    if (tg.openLink) tg.openLink(targetUrl);
+    else window.open(targetUrl, '_blank');
+
+    userData.task_states[btnId] = 'claim';
+    renderSocialTasks();
+    saveUserDataToSupabase();
+  } else if (currentState === 'claim') {
+    triggerFullScreenAd(btnId, () => {
+      userData.balance = (userData.balance || 0) + reward;
+      userData.task_states[btnId] = 'done';
+      
+      updateUI();
+      renderSocialTasks();
+      saveUserDataToSupabase();
+    });
+  }
+}
+
+function copyReferralLink() {
+  navigator.clipboard.writeText(`https://t.me/B2BRewardbot/app?startapp=${telegramId}`);
+  alert('Referral link copied!');
 }
 
 function handleWithdrawal() {
   const wallet = tonConnectUI.account?.address;
   if (!wallet) return alert("Please connect your TON wallet first!");
-  
-  if (userData.balance < 20000) {
-    return alert(`Minimum withdrawal is 20,000 B2B points.\nYour current balance: ${userData.balance.toLocaleString()} B2B points.`);
+  if ((userData.balance || 0) < 20000) {
+    return alert(`Minimum withdrawal is 20,000 B2B points.\nYour current balance: ${(userData.balance || 0).toLocaleString()} B2B points.`);
   }
-  
-  alert(`Withdrawal request submitted for ${userData.balance.toLocaleString()} B2B points to wallet:\n${wallet}`);
+  alert(`Withdrawal request submitted for ${(userData.balance || 0).toLocaleString()} B2B points to wallet:\n${wallet}`);
 }
 
-    function toggleTheme() {
-      const isLight = document.body.getAttribute('data-theme') === 'light';
-      if (isLight) {
-        document.body.removeAttribute('data-theme');
-        document.getElementById('theme-icon').innerText = '🌙';
-        localStorage.setItem('app_theme', 'dark');
-      } else {
-        document.body.setAttribute('data-theme', 'light');
-        document.getElementById('theme-icon').innerText = '☀️';
-        localStorage.setItem('app_theme', 'light');
-      }
-    }
+function toggleTheme() {
+  const isLight = document.body.getAttribute('data-theme') === 'light';
+  if (isLight) {
+    document.body.removeAttribute('data-theme');
+    document.getElementById('theme-icon').innerText = '🌙';
+  } else {
+    document.body.setAttribute('data-theme', 'light');
+    document.getElementById('theme-icon').innerText = '☀️';
+  }
+}
 
-    initUser();
+initUser();
+
   </script>
 </body>
 </html>
