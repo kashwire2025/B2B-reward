@@ -180,10 +180,11 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyZmJqcmJmZXV5anVueHpqc2FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwNDQzODUsImV4cCI6MjEwMzYyMDM4NX0.XMn6B-o6_Qbtwp1aYQIl0vOLKvNTN2irPO47hEtoVSE';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const MONETAG_DIRECT_LINK = "";
+    // LINE 147: Monetag Direct Link URL
+    const MONETAG_DIRECT_LINK = "https://omg10.com/4/11693106";
 
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+    const tg = window.Telegram?.WebApp || {};
+    if (tg.expand) tg.expand();
 
     const user = tg.initDataUnsafe?.user;
     const telegramId = user?.id ? String(user.id) : 'test_user_123';
@@ -194,7 +195,6 @@
     let socialTasks = [];
     const taskStates = {};
 
-    // Default social tasks list containing all provided links
     const DEFAULT_SOCIAL_TASKS = [
       { id: 'x_1', title: 'Follow Maxit on X', icon: '𝕏', url: 'https://www.x.com/Maxit_official', points: 100 },
       { id: 'fb_1', title: 'Follow Facebook Page 1', icon: '📘', url: 'https://www.facebook.com/share/1UGiF61DoX/', points: 100 },
@@ -227,7 +227,6 @@
       buttonRootId: 'ton-connect'
     });
 
-    // Rewarded Interstitial Ad Trigger (Zone 11691092)
     function triggerFullScreenAd(btnId, callback) {
       const btn = document.getElementById(btnId);
       if (btn) btn.disabled = true;
@@ -248,7 +247,7 @@
     }
 
     function executeFallback(btnId, callback) {
-      if (MONETAG_DIRECT_LINK) {
+      if (MONETAG_DIRECT_LINK && !MONETAG_DIRECT_LINK.includes("your-monetag-direct-link-url-here")) {
         if (tg.openLink) {
           tg.openLink(MONETAG_DIRECT_LINK);
         } else {
@@ -354,9 +353,11 @@
 
       if (lastDate === today) {
         const btn = document.getElementById('checkin-btn');
-        btn.disabled = true;
-        btn.innerText = 'Claimed ✓';
-        btn.style.background = '#21262d';
+        if (btn) {
+          btn.disabled = true;
+          btn.innerText = 'Claimed ✓';
+          btn.style.background = '#21262d';
+        }
       }
     }
 
@@ -387,9 +388,11 @@
 
         updateBalance(reward);
         const btn = document.getElementById('checkin-btn');
-        btn.disabled = true;
-        btn.innerText = 'Claimed ✓';
-        btn.style.background = '#21262d';
+        if (btn) {
+          btn.disabled = true;
+          btn.innerText = 'Claimed ✓';
+          btn.style.background = '#21262d';
+        }
       });
     }
 
@@ -431,7 +434,6 @@
         btn.innerText = 'Claim';
         btn.style.background = '#8957e5';
       } else if (currentState === 'claim') {
-        // Requires full ad view prior to crediting task reward
         triggerFullScreenAd(btnId, () => {
           updateBalance(reward);
           taskStates[btnId] = 'done';
