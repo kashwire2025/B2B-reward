@@ -94,13 +94,12 @@
   <div class="card">
     <div class="balance-label">Your Balance</div>
     <div class="balance-val"><span id="balance">0</span> B2B</div>
-    <div class="usdt-val">≈ $<span id="usdt-val">0.00</span> USDT</div>
 
     <div class="action-row">
       <button class="btn-action btn-purple">⚡ Earn</button>
       <button class="btn-action btn-dark" onclick="handleWithdrawal()">💳 Withdraw</button>
     </div>
-  </div>
+  </>
 
   <div id="ton-connect" style="display: flex; justify-content: center; margin-bottom: 16px;"></div>
 
@@ -453,23 +452,24 @@
     }
 
     function updateUI() {
-      document.getElementById('balance').innerText = userBalance.toLocaleString();
-      document.getElementById('usdt-val').innerText = (userBalance / 10000).toFixed(4);
-      document.getElementById('task-progress').innerText = `${completedTasksCount}/${socialTasks.length}`;
-    }
+  document.getElementById('balance').innerText = userData.balance.toLocaleString();
+  document.getElementById('daily-count').innerText = userData.daily_ad_count;
+  document.getElementById('unlimited-count').innerText = userData.unlimited_ad_count;
+  
+  const completedCount = Object.values(userData.task_states).filter(v => v === 'done').length;
+  document.getElementById('task-progress').innerText = `${completedCount}/${socialTasks.length}`;
+}
 
-    async function updateBalance(amountToAdd) {
-      userBalance += amountToAdd;
-      updateUI();
-      await supabaseClient.from('users').update({ balance: userBalance }).eq('telegram_id', telegramId);
-    }
-
-    function handleWithdrawal() {
-      const wallet = tonConnectUI.account?.address;
-      if (!wallet) return alert("Please connect your TON wallet first!");
-      if (userBalance < 20000) return alert("Minimum balance for withdrawal is 20,000 B2B");
-      alert("Withdrawal requested for address: " + wallet);
-    }
+function handleWithdrawal() {
+  const wallet = tonConnectUI.account?.address;
+  if (!wallet) return alert("Please connect your TON wallet first!");
+  
+  if (userData.balance < 20000) {
+    return alert(`Minimum withdrawal is 20,000 B2B points.\nYour current balance: ${userData.balance.toLocaleString()} B2B points.`);
+  }
+  
+  alert(`Withdrawal request submitted for ${userData.balance.toLocaleString()} B2B points to wallet:\n${wallet}`);
+}
 
     function toggleTheme() {
       const isLight = document.body.getAttribute('data-theme') === 'light';
